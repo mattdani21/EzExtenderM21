@@ -28,3 +28,6 @@ python -m app.ingest_policy
 # Run server
 uvicorn app.main:app --reload
 # open http://127.0.0.1:8000
+
+Seed sample precedents (optional):
+python scripts/seed_precedent.py
