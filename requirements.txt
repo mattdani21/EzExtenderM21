@@ -1,0 +1,19 @@
+fastapi
+uvicorn[standard]
+jinja2
+pydantic
+python-dotenv
+requests
+
+# RAG
+chromadb
+weaviate-client
+sentence-transformers
+
+# parsing
+docling
+
+# optional dev hygiene
+pre-commit
+detect-secrets
+python-multipart

@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Local state
+.env
+data/chroma/
+# OS/IDE
+.DS_Store
+.vscode/
+.idea/

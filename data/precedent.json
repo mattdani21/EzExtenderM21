@@ -1,0 +1,14 @@
+{
+  "minor_illness": {
+    "allow": 1,
+    "deny": 7
+  },
+  "bereavement": {
+    "allow": 5,
+    "deny": 0
+  },
+  "other": {
+    "allow": 1,
+    "deny": 2
+  }
+}

@@ -1,0 +1,4 @@
+ALLOW: Bereavement / death in the immediate family may be approved. Provide proof.
+ALLOW: Hospitalization or serious injury (e.g., broken wrist) may be approved with medical note.
+DENY: Minor illness such as flu/common cold is not sufficient for an extension.
+DENY: Travel or vacation plans are not valid reasons for an extension.

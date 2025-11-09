@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EzExtender 2.0 — Local Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --fg:#111; --muted:#666; --ok:#1a7f37; --warn:#c58100; --bad:#b91c1c; --bg:#fafafa; --card:#fff; --line:#e5e7eb; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:var(--bg); margin:0; }
+    .wrap { max-width: 900px; margin: 24px auto 80px; padding: 0 16px; }
+    h1 { margin: 0 0 8px; }
+    p.hint { color: var(--muted); margin-top: 0; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin:12px 0; }
+    label { display:block; font-weight:600; margin:8px 0 6px; }
+    input[type="text"], input[type="number"], textarea {
+      width:100%; font:inherit; border:1px solid var(--line); border-radius:8px; padding:10px;
+      background:#fff; box-sizing:border-box;
+    }
+    textarea { min-height:84px; }
+    button { font:inherit; border:1px solid var(--line); background:#111; color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer; }
+    button.ghost { background:#fff; color:#111; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .kvs { display:grid; grid-template-columns: 170px 1fr; gap:6px 12px; font-size:14px; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line); }
+    .pill.ok { color:var(--ok); border-color:var(--ok); }
+    .pill.bad { color:var(--bad); border-color:var(--bad); }
+    .pill.warn{ color:var(--warn); border-color:var(--warn); }
+    pre { white-space:pre-wrap; word-break:break-word; font-size:13px; background:#0b1020; color:#e6edf3; border-radius:10px; padding:12px; }
+    details > summary { cursor:pointer; user-select:none; }
+    .section-title { font-weight:700; margin:0 0 8px; }
+    .muted { color:var(--muted); }
+    .divider { height:1px; background:var(--line); margin:12px 0; }
+    .actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .btn-approve { background:var(--ok); border-color:var(--ok); }
+    .btn-deny { background:var(--bad); border-color:var(--bad); }
+    .small { font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>EzExtender 2.0 — Local Demo</h1>
+    <p class="hint">Submit an extension request. Check the 48-hour rule first.</p>
+
+    <form id="f" class="card">
+      <label>Deadline (ISO, e.g. 2025-12-01T23:59:00Z)</label>
+      <input id="deadline" name="deadline_iso" type="text" value="2025-11-01T23:59:00Z" />
+
+      <div class="row">
+        <div style="flex:1">
+          <label>Days requested</label>
+          <input id="days" name="days_requested" type="number" value="3" min="1" />
+        </div>
+      </div>
+
+      <label>Reason</label>
+      <textarea id="reason" name="reason_text" placeholder="Brief reason…"></textarea>
+
+      <div style="margin-top:12px">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+
+    <!-- 48h rule panel -->
+    <div id="deadlinePanel" class="card" style="display:none">
+      <div class="section-title">Deadline context</div>
+      <div class="kvs small">
+        <div class="muted">Now (UTC)</div><div id="nowUtc">—</div>
+        <div class="muted">Deadline (UTC)</div><div id="dlUtc">—</div>
+        <div class="muted">Hours to deadline</div><div id="hrsTo">—</div>
+        <div class="muted">Within 48h</div>
+        <div>
+          <span id="within48Badge" class="pill">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidence (policy + precedent) -->
+    <div id="evidencePanel" class="card" style="display:none">
+      <div class="section-title">Evidence</div>
+
+      <div id="policyTop" style="display:none">
+        <div class="muted small">Top policy hit</div>
+        <div id="policySnippet" class="small" style="margin-top:6px"></div>
+        <div class="small muted" style="margin-top:4px">
+          <span id="policyLabel" class="pill">—</span>
+          <span id="policySim" style="margin-left:8px">sim: —</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="precedentBlock" style="display:none">
+        <div class="muted small">Precedent (by tag)</div>
+        <div class="kvs small" style="margin-top:6px">
+          <div class="muted">Tag</div><div id="precTag">—</div>
+          <div class="muted">Allow</div><div id="precAllow">—</div>
+          <div class="muted">Deny</div><div id="precDeny">—</div>
+          <div class="muted">Allow rate</div><div id="precRate">—</div>
+          <div class="muted">Hint</div><div id="precHint">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decision + HITL -->
+    <div id="decisionPanel" class="card" style="display:none">
+      <div class="section-title">Decision</div>
+      <div class="kvs small">
+        <div class="muted">System decision</div><div id="decType">—</div>
+        <div class="muted">Via</div><div id="decVia">—</div>
+        <div class="muted">Recommend</div><div id="decRec">—</div>
+        <div class="muted">Confidence</div><div id="decConf">—</div>
+        <div class="muted">Explanation</div><div id="decExpl">—</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="actions">
+        <button id="btnApprove" class="btn-approve">Approve</button>
+        <button id="btnDeny" class="btn-deny">Deny</button>
+        <input id="reviewer" type="text" placeholder="Your name (optional)" class="small" style="padding:8px 10px; border-radius:8px; border:1px solid var(--line);">
+        <span id="saveMsg" class="small muted"></span>
+      </div>
+    </div>
+
+    <!-- Raw JSON -->
+    <div id="rawPanel" class="card" style="display:none">
+      <details open>
+        <summary><strong>Raw response</strong></summary>
+        <pre id="raw"></pre>
+      </details>
+    </div>
+  </div>
+
+<script>
+const form = document.getElementById('f');
+const deadlineEl = document.getElementById('deadline');
+const daysEl = document.getElementById('days');
+const reasonEl = document.getElementById('reason');
+
+// Panels
+const deadlinePanel = document.getElementById('deadlinePanel');
+const evidencePanel = document.getElementById('evidencePanel');
+const decisionPanel = document.getElementById('decisionPanel');
+const rawPanel = document.getElementById('rawPanel');
+
+// Deadline fields
+const nowUtc = document.getElementById('nowUtc');
+const dlUtc = document.getElementById('dlUtc');
+const hrsTo = document.getElementById('hrsTo');
+const within48Badge = document.getElementById('within48Badge');
+
+// Policy top
+const policyTop = document.getElementById('policyTop');
+const policySnippet = document.getElementById('policySnippet');
+const policyLabel = document.getElementById('policyLabel');
+const policySim = document.getElementById('policySim');
+
+// Precedent
+const precedentBlock = document.getElementById('precedentBlock');
+const precTag = document.getElementById('precTag');
+const precAllow = document.getElementById('precAllow');
+const precDeny = document.getElementById('precDeny');
+const precRate = document.getElementById('precRate');
+const precHint = document.getElementById('precHint');
+
+// Decision
+const decType = document.getElementById('decType');
+const decVia = document.getElementById('decVia');
+const decRec = document.getElementById('decRec');
+const decConf = document.getElementById('decConf');
+const decExpl = document.getElementById('decExpl');
+
+// HITL
+const btnApprove = document.getElementById('btnApprove');
+const btnDeny = document.getElementById('btnDeny');
+const reviewer = document.getElementById('reviewer');
+const saveMsg = document.getElementById('saveMsg');
+
+// Raw
+const raw = document.getElementById('raw');
+
+function show(el, on) { el.style.display = on ? '' : 'none'; }
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  saveMsg.textContent = '';
+
+  const fd = new FormData();
+  fd.append('deadline_iso', deadlineEl.value.trim());
+  fd.append('days_requested', daysEl.value.trim());
+  fd.append('reason_text', reasonEl.value.trim());
+
+  const res = await fetch('/request', { method: 'POST', body: fd });
+  const data = await res.json();
+
+  // Deadline panel
+  const dm = data.deadline_meta || {};
+  if (dm && dm.deadline_utc) {
+    nowUtc.textContent = dm.now_utc || '—';
+    dlUtc.textContent = dm.deadline_utc || '—';
+    hrsTo.textContent = (dm.hours_to_deadline !== undefined) ? dm.hours_to_deadline.toFixed(1) : '—';
+    const w = !!dm.within_48h;
+    within48Badge.textContent = w ? 'yes' : 'no';
+    within48Badge.className = 'pill ' + (w ? 'ok' : 'bad');
+    show(deadlinePanel, true);
+  } else {
+    show(deadlinePanel, false);
+  }
+
+  // Evidence (top policy hit only)
+  const ev = Array.isArray(data.evidence) ? data.evidence : [];
+  const topPolicy = ev.find(e => e.source === 'sample_policy.txt' || e.source === 'policy' || (e.label && (e.label === 'allow' || e.label === 'deny')));
+  if (topPolicy) {
+    policySnippet.textContent = topPolicy.snippet || '';
+    policyLabel.textContent = topPolicy.label || '—';
+    policyLabel.className = 'pill ' + (topPolicy.label === 'allow' ? 'ok' : (topPolicy.label === 'deny' ? 'bad' : ''));
+    policySim.textContent = 'sim: ' + (typeof topPolicy.similarity === 'number' ? topPolicy.similarity.toFixed(3) : '—');
+    show(policyTop, true);
+  } else {
+    show(policyTop, false);
+  }
+
+  // Precedent block
+  const prec = data.precedent || {};
+  if (prec && prec.tag) {
+    precTag.textContent = prec.tag;
+    const stats = prec.stats || {};
+    precAllow.textContent = stats.allow ?? 0;
+    precDeny.textContent = stats.deny ?? 0;
+    precRate.textContent = (typeof prec.allow_rate === 'number') ? (prec.allow_rate * 100).toFixed(0) + '%' : '—';
+    precHint.textContent = prec.hint || '—';
+    show(precedentBlock, true);
+  } else {
+    show(precedentBlock, false);
+  }
+  show(evidencePanel, topPolicy || prec?.tag);
+
+  // Decision panel
+  decType.textContent = data.decision || '—';
+  decVia.textContent = data.via || '—';
+  decRec.textContent = data.recommend ?? '—';
+  decConf.textContent = (typeof data.confidence === 'number') ? data.confidence.toFixed(3) : '—';
+  decExpl.textContent = data.explanation || '—';
+  show(decisionPanel, true);
+
+  // Raw
+  raw.textContent = JSON.stringify(data, null, 2);
+  show(rawPanel, true);
+
+  // Wire HITL handlers to current form values
+  wireHITLHandlers();
+});
+
+function wireHITLHandlers() {
+  const payloadBase = () => {
+    const fd = new FormData();
+    fd.append('deadline_iso', deadlineEl.value.trim());
+    fd.append('days_requested', daysEl.value.trim());
+    fd.append('reason_text', reasonEl.value.trim());
+    fd.append('reviewer', reviewer.value.trim() || 'anonymous');
+    return fd;
+  };
+
+  btnApprove.onclick = async () => {
+    const fd = payloadBase();
+    fd.append('outcome', 'allow');
+    const res = await fetch('/review', { method:'POST', body: fd });
+    const data = await res.json();
+    saveMsg.textContent = data.ok ? 'Saved precedent: ' + data.stored.tag + ' -> allow' : ('Error: ' + (data.error || 'unknown'));
+  };
+
+  btnDeny.onclick = async () => {
+    const fd = payloadBase();
+    fd.append('outcome', 'deny');
+    const res = await fetch('/review', { method:'POST', body: fd });
+    const data = await res.json();
+    saveMsg.textContent = data.ok ? 'Saved precedent: ' + data.stored.tag + ' -> deny' : ('Error: ' + (data.error || 'unknown'));
+  };
+}
+</script>
+</body>
+</html>
