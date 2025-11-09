@@ -1,8 +1,8 @@
 # EzExtender 2.0 — Local Demo
 
-A tiny, end-to-end prototype for extension requests:
+A tiny, end-to-end prototype for an extension to our extension requestor offering:
 - **Rule**: 48-hour window check (auto-approve if >48h away).
-- **Policy RAG**: Chroma + BGE embeddings over policy chunks.
+- **Policy RAG**: Chroma + BGE embeddings over policy chunks for this demo.
 - **Precedent RAG**: Stores human decisions as vectors for future retrieval.
 - **HITL**: Reviewer approves/denies; decision is logged as **precedent**.
 
@@ -29,8 +29,7 @@ export EZ_DEMO_NOW_UTC="2025-11-01T12:00:00Z"
 python -m app.ingest_policy
 
 # Run server
-uvicorn app.main:app --reload
-# open http://127.0.0.1:8000
+ # open http://127.0.0.1:8000
 
 Seed sample precedents (optional):
 python scripts/seed_precedent.py
