@@ -1,0 +1,9 @@
+flowchart LR
+  A[User form] --> B{>48h?}
+  B -->|yes| C[Auto-approve]
+  B -->|no| D[Policy RAG]
+  D --> E[Precedent RAG]
+  E --> F[Blend + cues]
+  F --> G[HITL Review]
+  G --> H[Store precedent]
+  H --> D
