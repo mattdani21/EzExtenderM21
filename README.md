@@ -6,7 +6,7 @@ A tiny, end-to-end prototype for extension requests:
 - **Precedent RAG**: Stores human decisions as vectors for future retrieval.
 - **HITL**: Reviewer approves/denies; decision is logged as **precedent**.
 
-![Architecture](docs/)
+![Architecture](architecture.mmd)
 
 <img width="600" height="107" alt="image" src="https://github.com/user-attachments/assets/ce513d11-cc70-4c7d-988a-087268cd6120" />
 
