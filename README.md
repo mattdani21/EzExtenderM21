@@ -10,9 +10,9 @@ A tiny, end-to-end prototype for extension requests:
 
 <img width="600" height="107" alt="image" src="https://github.com/user-attachments/assets/ce513d11-cc70-4c7d-988a-087268cd6120" />
 
+> 🎬 **Demo Video:**  
+> [▶️ Watch EzExtender 2.0 in action on Google Drive](https://drive.google.com/file/d/1Wqei50mk8jdLufhPrHjLBDUVJH1ghB9n/view?usp=sharing)
 
-> 🎥 **Demo**: [docs/demo.mp4](docs/demo.mp4)  
-> (If GitHub won’t render, download and play locally.)
 
 ---
 
