@@ -29,3 +29,10 @@ None (add pytest in M1).
 ## Run command
 
 `uvicorn app.main:app --reload` (FastAPI convention per README quick start intent; the command line itself is currently missing from README.md — fixed in M2)
+
+## 🔑 Secret hygiene (2026-08-06)
+
+- A real `GROQ_API_KEY` was committed to `.env.example` in commit `dc92082` ("Full app working") and later replaced with a placeholder.
+- **The key was rotated on 2026-08-06. It is dead — do NOT restore it from git history.** Obtain a fresh key from the provider and set it in `.env` only (never commit it).
+- Usage must stay env-var-only: `GROQ_API_KEY` read via `os.environ` / `python-dotenv`; `.env` is already in `.gitignore`.
+- If `app/llm.py` (currently empty) is implemented, it must read the key from the environment — never a literal.
